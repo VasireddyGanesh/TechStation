@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Gstation</string>
+    <string name="login"><u>Login</u></string>
+    <string name="sign_up"><u>Sign Up</u></string>
+</resources>

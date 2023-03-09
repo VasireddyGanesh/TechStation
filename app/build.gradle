@@ -1,0 +1,62 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.example.loadimages'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.apxorlabs.techstation"
+        minSdk 26
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'com.google.code.gson:gson:2.6.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    implementation 'com.apxor.androidx:apxor-android-sdk-core:2.8.8@aar'
+    implementation 'com.apxor.androidx:apxor-android-sdk-qe:1.5.6@aar'
+    implementation 'com.apxor.androidx:apxor-android-sdk-rtm:2.0.0@aar'
+    implementation 'com.apxor.androidx:surveys:1.3.8@aar'
+
+
+    // Add this to track application crashes
+    implementation 'com.apxor.androidx:apxor-android-crash-reporter:1.0.5@aar'
+
+    // Helper plugin to create walkthroughs
+    implementation 'com.apxor.androidx:wysiwyg:1.3.5@aar'
+
+    // Add this to log events without attributes at runtime
+    implementation 'com.apxor.androidx:jit-log:1.0.0@aar'
+
+}

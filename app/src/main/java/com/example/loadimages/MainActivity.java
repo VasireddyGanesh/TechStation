@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     FloatingActionButton fab;
 
+    float xDown , yDown;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +73,29 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             @Override
             public void onClick(View view) {
                 ApxorSDK.logAppEvent("ReactEvent1");
+            }
+        });
+
+        fab.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event){
+                switch (event.getActionMasked()){
+                    case MotionEvent.ACTION_DOWN:
+                        xDown=event.getX();
+                        yDown=event.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float movedX,movedY;
+                        movedX=event.getX();
+                        movedY=event.getY();
+
+                        float distanceX=movedX-xDown;
+                        float distanceY=movedY-yDown;
+
+                        fab.setX(fab.getX()+distanceX);
+                        fab.setY(fab.getY()+distanceY);
+                        break;
+                }
+                return true;
             }
         });
     }

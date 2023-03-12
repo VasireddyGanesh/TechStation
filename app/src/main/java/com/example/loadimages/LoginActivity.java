@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     TextView sign_up_txt;
 
     FloatingActionButton fab;
+
+    float xDown,yDown;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,29 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ApxorSDK.logAppEvent("ReactEvent1");
+            }
+        });
+
+        fab.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event){
+                switch (event.getActionMasked()){
+                    case MotionEvent.ACTION_DOWN:
+                        xDown=event.getX();
+                        yDown=event.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float movedX,movedY;
+                        movedX=event.getX();
+                        movedY=event.getY();
+
+                        float distanceX=movedX-xDown;
+                        float distanceY=movedY-yDown;
+
+                        fab.setX(fab.getX()+distanceX);
+                        fab.setY(fab.getY()+distanceY);
+                        break;
+                }
+                return true;
             }
         });
     }

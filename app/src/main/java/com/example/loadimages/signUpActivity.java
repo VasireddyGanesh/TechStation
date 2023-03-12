@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.apxor.androidsdk.core.ApxorSDK;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,13 +37,16 @@ public class signUpActivity extends AppCompatActivity {
     Button submit_btn;
 
     TextView login_text_btn;
+    FloatingActionButton fab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.activity_sign_up);
-
+        ApxorSDK.registerSimpleNotification("inapp_shown",signUpActivity.this::hideFab);
+        ApxorSDK.registerSimpleNotification("inapp_dismissed",signUpActivity.this::showFab);
         login_text_btn=findViewById(R.id.login_txt);
+        fab=findViewById(R.id.fab);
 
         SharedPreferences sharedPrefs = getSharedPreferences("GStation", MODE_PRIVATE);
         SharedPreferences.Editor ed;
@@ -95,6 +103,34 @@ public class signUpActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent(signUpActivity.this,LoginActivity.class);
                 startActivity(i);
+            }
+        });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ApxorSDK.logAppEvent("ReactEvent1");
+            }
+        });
+    }
+    public void hideFab(){
+        Handler mainHandler = new Handler(this.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // your code here
+                fab.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void showFab(){
+        Handler mainHandler = new Handler(this.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // your code here
+                fab.setVisibility(View.VISIBLE);
             }
         });
     }

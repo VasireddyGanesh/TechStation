@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.apxor.androidsdk.core.ApxorSDK;
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
@@ -29,6 +31,8 @@ public class HomeActivity extends AppCompatActivity {
     boolean liked=true;
 
     String user_id;
+
+    FloatingActionButton fab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,8 +190,39 @@ public class HomeActivity extends AppCompatActivity {
                 });
             }
         });
-
+        ApxorSDK.registerSimpleNotification("inapp_shown",HomeActivity.this::hideFab);
+        ApxorSDK.registerSimpleNotification("inapp_dismissed",HomeActivity.this::showFab);
+        fab=findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ApxorSDK.logAppEvent("ReactEvent1");
+            }
+        });
     }
+
+    public void hideFab(){
+        Handler mainHandler = new Handler(this.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // your code here
+                fab.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void showFab(){
+        Handler mainHandler = new Handler(this.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // your code here
+                fab.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
 }
 
 class ImageLike {

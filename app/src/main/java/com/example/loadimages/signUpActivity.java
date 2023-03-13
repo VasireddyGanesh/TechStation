@@ -22,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apxor.androidsdk.core.ApxorSDK;
+import com.example.loadimages.db.AppDatabase;
+import com.example.loadimages.db.UserEntity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
@@ -76,7 +78,7 @@ public class signUpActivity extends AppCompatActivity {
                     JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
                     HashMap<String,String> headermap = new HashMap<String,String>();
                     headermap.put("Content-Type","application/json");
-
+                    insertUserIntoRoom(name.getText().toString(),email.getText().toString(),contact.getText().toString());
                     Call<ResponseBody> call = jsonPlaceHolderApi.createUser(headermap,new User(contact.getText().toString(),name.getText().toString(),email.getText().toString(),contact.getText().toString()));
                     call.enqueue(new Callback<ResponseBody>() {
                         @Override
@@ -98,10 +100,12 @@ public class signUpActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(Call<ResponseBody> call, Throwable t) {
                             Log.d("Debug :","User Insertion Failed");
+                            Toast.makeText(getApplicationContext(),"Account Creation Failed",Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             });
+
         }
         login_text_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +145,12 @@ public class signUpActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    public void insertUserIntoRoom(String name, String email, String contact) {
+        Log.d("Debug :","Insert User into Room");
+        AppDatabase appDatabase= AppDatabase.getInstance(this.getApplicationContext());
+        appDatabase.userDao().insert(new UserEntity(name,email,contact));
     }
     public void hideFab(){
         Handler mainHandler = new Handler(this.getMainLooper());

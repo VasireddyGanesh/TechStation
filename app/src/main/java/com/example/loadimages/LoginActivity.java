@@ -13,8 +13,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apxor.androidsdk.core.ApxorSDK;
+import com.example.loadimages.db.AppDatabase;
+import com.example.loadimages.db.UserEntity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
@@ -51,40 +54,54 @@ public class LoginActivity extends AppCompatActivity {
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("https://tt.apxor.com/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-
-                JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
-                HashMap<String,String> headermap = new HashMap<String,String>();
-                headermap.put("Content-Type","application/json");
-
-                Call<List<User>> call = jsonPlaceHolderApi.authUser(login_id.getText().toString());
-                call.enqueue(new Callback<List<User>>() {
-                    @Override
-                    public void onResponse(Call<List<User>>call, Response<List<User>> response) {
-                        if (!response.isSuccessful()) {
-                            Log.d("Debug :","Code: " + response.code());
-                            return;
-                        }
-                        User u= response.body().get(0);
-                        SharedPreferences sharedPreferences = getSharedPreferences("GStation", MODE_PRIVATE);
+//                Retrofit retrofit = new Retrofit.Builder()
+//                        .baseUrl("https://tt.apxor.com/")
+//                        .addConverterFactory(GsonConverterFactory.create())
+//                        .build();
+//
+//                JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
+//                HashMap<String,String> headermap = new HashMap<String,String>();
+//                headermap.put("Content-Type","application/json");
+//
+//                Call<List<User>> call = jsonPlaceHolderApi.authUser(login_id.getText().toString());
+//                call.enqueue(new Callback<List<User>>() {
+//                    @Override
+//                    public void onResponse(Call<List<User>>call, Response<List<User>> response) {
+//                        if (!response.isSuccessful()) {
+//                            Log.d("Debug :","Code: " + response.code());
+//                            return;
+//                        }
+//                        User u= response.body().get(0);
+//                        SharedPreferences sharedPreferences = getSharedPreferences("GStation", MODE_PRIVATE);
+//                        SharedPreferences.Editor myEdit = sharedPreferences.edit();
+//                        myEdit.putString("name", u.getName());
+//                        myEdit.putString("email", u.getEmail() );
+//                        myEdit.putString("contact",u.getContact());
+//                        myEdit.apply();
+//
+//                        Intent i=new Intent(LoginActivity.this,MainActivity.class);
+//                        startActivity(i);
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<List<User>> call, Throwable t) {
+//                        Log.d("Debug :","User Login Failed");
+//                    }
+//                });
+                AppDatabase appDatabase= AppDatabase.getInstance(getApplicationContext());
+                List<UserEntity> list=appDatabase.userDao().find(login_id.getText().toString());
+                if(list.size()>=1){
+                    SharedPreferences sharedPreferences = getSharedPreferences("GStation", MODE_PRIVATE);
                         SharedPreferences.Editor myEdit = sharedPreferences.edit();
-                        myEdit.putString("name", u.getName());
-                        myEdit.putString("email", u.getEmail() );
-                        myEdit.putString("contact",u.getContact());
+                        myEdit.putString("contact",login_id.getText().toString());
                         myEdit.apply();
                         Intent i=new Intent(LoginActivity.this,MainActivity.class);
                         startActivity(i);
                         finish();
-                    }
-
-                    @Override
-                    public void onFailure(Call<List<User>> call, Throwable t) {
-                        Log.d("Debug :","User Login Failed");
-                    }
-                });
+                }else{
+                    Toast.makeText(getApplicationContext(),"Invalid Login Details",Toast.LENGTH_SHORT).show();
+                }
             }
         });
         sign_up_txt.setOnClickListener(new View.OnClickListener() {

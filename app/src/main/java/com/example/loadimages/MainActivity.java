@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +30,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewInterface{
+public class MainActivity extends AppCompatActivity implements RecyclerViewInterface,SwipeRefreshLayout.OnRefreshListener{
     private RecyclerView recyclerView;
 
     Context context;
@@ -58,13 +59,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         recyclerView=findViewById(R.id.mRecyclerView);
         swipeRefreshLayout=findViewById(R.id.swipe);
         showList();
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                showList();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         ApxorSDK.registerSimpleNotification("inapp_shown",MainActivity.this::hideFab);
         ApxorSDK.registerSimpleNotification("inapp_dismissed",MainActivity.this::showFab);
@@ -99,6 +94,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             }
         });
     }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent intent = new Intent(MainActivity.this , HomeActivity.class);
+
+        intent.putExtra("headline", posts.get(position).getImage_headline());
+        intent.putExtra("image_url",posts.get(position).getImage_url());
+        intent.putExtra("description",posts.get(position).getImage_desc());
+        intent.putExtra("likes",posts.get(position).getImage_likes());
+        intent.putExtra("shares",posts.get(position).getImage_shares());
+        intent.putExtra("share_url",posts.get(position).getShare_url());
+        intent.putExtra("image_id",posts.get(position).getImage_id());
+        startActivity(intent);
+    }
+
     public void showList(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://tt.apxor.com/")
@@ -129,19 +139,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 Log.d("failure",t.getMessage());
             }
         });
-    }
-    @Override
-    public void onItemClick(int position) {
-        Intent intent = new Intent(MainActivity.this , HomeActivity.class);
-
-        intent.putExtra("headline", posts.get(position).getImage_headline());
-        intent.putExtra("image_url",posts.get(position).getImage_url());
-        intent.putExtra("description",posts.get(position).getImage_desc());
-        intent.putExtra("likes",posts.get(position).getImage_likes());
-        intent.putExtra("shares",posts.get(position).getImage_shares());
-        intent.putExtra("share_url",posts.get(position).getShare_url());
-        intent.putExtra("image_id",posts.get(position).getImage_id());
-        startActivity(intent);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -188,6 +185,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 fab.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        showList();
+        swipeRefreshLayout.setRefreshing(false);
+        Toast.makeText(getApplicationContext(),"Refresh",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        swipeRefreshLayout.setRefreshing(true);
+        onRefresh();
     }
 
 }

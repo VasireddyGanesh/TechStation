@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +30,22 @@ public class FavouritesActivity extends AppCompatActivity implements RecyclerVie
 
     Context context;
     RecyclerView recyclerView;
+    TextView text_msg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favourites);
         recyclerView=findViewById(R.id.fav_recycler);
+        context=this;
+        getLikedImages();
+        text_msg=findViewById(R.id.show_msg);
+    }
+
+    private void getLikedImages() {
         Retrofit retrofit=new Retrofit.Builder()
                 .baseUrl("https://tt.apxor.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        context=this;
         SharedPreferences sharedPreferences= getSharedPreferences("GStation",MODE_PRIVATE);
         String userId=sharedPreferences.getString("contact","");
 
@@ -51,7 +59,12 @@ public class FavouritesActivity extends AppCompatActivity implements RecyclerVie
                     Log.d("Unsuccessful","Code: " + response.code());
                     return;
                 }
-                getList(response.body());
+                if(response.body() !=null && response.body().size()>=1){
+                    getList(response.body());
+                }else{
+                    text_msg.setVisibility(View.VISIBLE);
+                    text_msg.setText("No Liked Posts");
+                }
             }
 
             @Override

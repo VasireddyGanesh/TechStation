@@ -19,6 +19,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -28,13 +29,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeActivity extends AppCompatActivity {
-    int likes,shares;
+    int likes,shares,image_id;
     boolean liked=true;
 
     String user_id;
 
     FloatingActionButton fab;
-
+    ImageView like_btn;
     float xDown,yDown;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +48,10 @@ public class HomeActivity extends AppCompatActivity {
         likes = getIntent().getIntExtra("likes",0);
         shares = getIntent().getIntExtra("shares",0);
         String share_url = getIntent().getStringExtra("share_url");
-        int image_id=getIntent().getExtras().getInt("image_id");
+        image_id=getIntent().getExtras().getInt("image_id");
 
         ApxorSDK.logAppEvent("HomeActivity Opened");
-        ImageView like_btn = findViewById(R.id.like_btn);
+        like_btn = findViewById(R.id.like_btn);
         ImageView share_btn = findViewById(R.id.share_btn);
         TextView tv_headline= findViewById(R.id.headline);
         TextView tv_dec = findViewById(R.id.desc);
@@ -68,6 +69,8 @@ public class HomeActivity extends AppCompatActivity {
         Glide.with(this)
                 .load(image_url)
                 .into(show_img);
+
+        checkLiked();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://tt.apxor.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -222,6 +225,47 @@ public class HomeActivity extends AppCompatActivity {
                         break;
                 }
                 return true;
+            }
+        });
+
+
+    }
+
+    private void checkLiked() {
+        Retrofit retrofit=new Retrofit.Builder()
+                .baseUrl("https://tt.apxor.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        SharedPreferences sharedPreferences= getSharedPreferences("GStation",MODE_PRIVATE);
+        String userId=sharedPreferences.getString("contact","");
+
+
+        JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
+        Call<List<ImageLike>> call = jsonPlaceHolderApi.getLikedImages(userId);
+        call.enqueue(new Callback<List<ImageLike>>() {
+            @Override
+            public void onResponse(Call<List<ImageLike>> call, Response<List<ImageLike>> response) {
+                if (!response.isSuccessful()) {
+                    Log.d("Unsuccessful","Code: " + response.code());
+                    return;
+                }
+                Log.d("Debug :","check Liked");
+                List<ImageLike> likedImages = response.body();
+                if(likedImages != null){
+                    for(ImageLike image:likedImages){
+                        if(image_id==image.getImage_id()){
+                            Log.d("Debug :","Liked");
+                            like_btn.setImageResource(R.drawable.appreciate_select);
+                            liked=false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ImageLike>> call, Throwable t) {
+                Log.d("failure",t.getMessage());
             }
         });
     }
